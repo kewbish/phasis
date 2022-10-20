@@ -1,7 +1,16 @@
 <script lang="ts">
-  import { Link } from "svelte-routing";
+  import { navigate } from "svelte-routing";
 
-  let path = "";
+  const checkValidPath = (e: Event) => {
+    if (!path.trim()) {
+      e.preventDefault();
+      document.getElementById("error").style.color = "black";
+      return;
+    }
+    navigate("/calendar");
+  };
+
+  export let path = "";
 </script>
 
 <main>
@@ -15,6 +24,8 @@
           viewBox="0 0 31 25"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
+          on:click={() => document.getElementById("text-input").focus()}
+          on:keydown={() => document.getElementById("text-input").focus()}
         >
           <path
             d="M27 4H4C1.79086 4 0 5.79086 0 8V21C0 23.2091 1.79086 25 4 25H27C29.2091 25 31 23.2091 31 21V8C31 5.79086 29.2091 4 27 4Z"
@@ -25,12 +36,11 @@
             fill="#B3F4AD"
           />
         </svg>
-        <input type="text" bind:value={path} />
+        <input type="text" bind:value={path} id="text-input" />
       </div>
-      <Link to="/calendar" {path}>
-        <input type="submit" value="go!" />
-      </Link>
+      <input type="submit" value="go!" on:click={checkValidPath} />
     </div>
+    <p id="error">Please enter a valid filepath.</p>
   </div>
 </main>
 
@@ -70,6 +80,7 @@
   }
   svg {
     padding-right: 8px;
+    cursor: pointer;
   }
   #textbox {
     background: #e0ffdd;
@@ -117,5 +128,9 @@
   input:focus {
     outline: none;
     box-shadow: rgba(9, 186, 58, 0.3) 4px 8px 8px;
+  }
+  #error {
+    color: transparent;
+    transition: ease-in-out 0.2s;
   }
 </style>
