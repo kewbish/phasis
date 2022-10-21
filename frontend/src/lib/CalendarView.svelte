@@ -1,5 +1,8 @@
 <script lang="ts">
   import Calendar from "./Calendar.svelte";
+  import { fade, scale } from "svelte/transition";
+  import { quintOut } from "svelte/easing";
+
   const monthDiff = (dateFrom: Date, dateTo: Date) => {
     return (
       dateTo.getMonth() -
@@ -25,37 +28,60 @@
 
   export let currentMonth = new Date();
 
-  let current = currentMonth;
-  current.setMonth(current.getMonth() - 1);
-  const previousMonth =
-    current
-      .toLocaleString("default", {
-        month: "long",
-      })
-      .toLowerCase() +
-    " " +
-    current.getFullYear();
-  current = currentMonth;
-  current.setMonth(current.getMonth() + 1);
-  const nextMonth =
-    current
-      .toLocaleString("default", {
-        month: "long",
-      })
-      .toLowerCase() +
-    " " +
-    current.getFullYear();
+  const goPrevious = () => {
+    currentMonth.setMonth(currentMonth.getMonth() - 1);
+    currentMonth = new Date(currentMonth.getTime());
+  };
+  const goNext = () => {
+    currentMonth.setMonth(currentMonth.getMonth() + 1);
+    currentMonth = new Date(currentMonth.getTime());
+  };
+
+  let previousMonth: String;
+  let nextMonth: String;
+  $: {
+    let current = new Date(currentMonth.getTime());
+    current.setMonth(current.getMonth() - 1);
+    previousMonth =
+      current
+        .toLocaleString("default", {
+          month: "long",
+        })
+        .toLowerCase() +
+      " " +
+      current.getFullYear();
+  }
+  $: {
+    let current = new Date(currentMonth.getTime());
+    current.setMonth(current.getMonth() + 1);
+    nextMonth =
+      current
+        .toLocaleString("default", {
+          month: "long",
+        })
+        .toLowerCase() +
+      " " +
+      current.getFullYear();
+  }
 
   export let gardenPath = "";
 </script>
 
 <main>
-  <div id="to-prev"><h2>{previousMonth} ‹</h2></div>
+  <div id="to-prev" on:click={goPrevious} on:keydown={goPrevious}>
+    {#key previousMonth}
+      <h2>{previousMonth} ‹</h2>
+    {/key}
+  </div>
   <div id="main-block">
-    <h1>
-      {currentMonth.toLocaleString("default", { month: "long" }).toLowerCase()}
-      <span class="dark-green">{currentMonth.getFullYear()}</span>
-    </h1>
+    {#key currentMonth}
+      <h1 transition:scale>
+        {currentMonth
+          .toLocaleString("default", { month: "long" })
+          .toLowerCase()}
+        <span class="dark-green">{currentMonth.getFullYear()}</span>
+      </h1>
+    {/key}
     {#await fetchData}
       <p>...Waiting</p>
     {:then data}
@@ -64,7 +90,11 @@
       <p>Error! {error}</p>
     {/await}
   </div>
-  <div id="to-next"><h2>› {nextMonth}</h2></div>
+  <div id="to-next" on:click={goNext} on:keydown={goNext}>
+    {#key nextMonth}
+      <h2>› {nextMonth}</h2>
+    {/key}
+  </div>
 </main>
 
 <style>
@@ -86,7 +116,7 @@
   }
   #to-next > h2,
   #to-prev > h2 {
-    margin: 20% 16px 16px;
+    margin: 35% 16px 16px;
     color: #808080;
     transition: ease-in-out 0.2s;
     cursor: pointer;
@@ -107,5 +137,6 @@
     display: flex;
     align-items: center;
     flex-direction: column;
+    margin-top: 64px;
   }
 </style>
