@@ -1,7 +1,6 @@
 <script lang="ts">
   import Calendar from "./Calendar.svelte";
-  import { fade, scale } from "svelte/transition";
-  import { quintOut } from "svelte/easing";
+  import { fly } from "svelte/transition";
 
   const monthDiff = (dateFrom: Date, dateTo: Date) => {
     return (
@@ -31,10 +30,12 @@
   const goPrevious = () => {
     currentMonth.setMonth(currentMonth.getMonth() - 1);
     currentMonth = new Date(currentMonth.getTime());
+    monthDirection = false;
   };
   const goNext = () => {
     currentMonth.setMonth(currentMonth.getMonth() + 1);
     currentMonth = new Date(currentMonth.getTime());
+    monthDirection = true;
   };
 
   let previousMonth: String;
@@ -65,6 +66,7 @@
   }
 
   export let gardenPath = "";
+  let monthDirection = true; // true for right, false for left
 </script>
 
 <main>
@@ -75,7 +77,7 @@
   </div>
   <div id="main-block">
     {#key currentMonth}
-      <h1 transition:scale>
+      <h1 in:fly={{ x: 50 * (monthDirection ? 1 : -1) }}>
         {currentMonth
           .toLocaleString("default", { month: "long" })
           .toLowerCase()}
