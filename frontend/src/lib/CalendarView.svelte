@@ -120,19 +120,22 @@
   }
   #to-next > h2,
   #to-prev > h2 {
-    margin: 35% 16px 16px;
+    margin: 55% 16px 16px;
     color: #808080;
     transition: ease-in-out 0.2s;
-    cursor: pointer;
   }
-  #to-next > h2:hover,
-  #to-prev > h2:hover {
+  #to-next:hover > h2,
+  #to-prev:hover > h2 {
     font-size: 30px;
     color: #406e45;
   }
   #to-next {
     display: flex;
     justify-content: end;
+  }
+  #to-next,
+  #to-prev {
+    cursor: pointer;
   }
   .dark-green {
     color: #406e45;
@@ -141,7 +144,7 @@
     display: flex;
     align-items: center;
     flex-direction: column;
-    margin-top: 64px;
+    margin-top: 20%;
   }
   #main-wrapper {
     display: flex;
