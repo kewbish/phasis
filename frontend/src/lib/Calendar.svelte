@@ -16,39 +16,9 @@
     return entries;
   };
 
-  const generateCalendar = (data: Array<[Date, ...Array<string>]>) => {
-    let table = "<table id='main-calendar'>";
-    table +=
-      "<tr><th>Sun</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th></tr>";
-    for (let i = 0; i <= firstDay; i++) {
-      table += "<td> </td>";
-    }
-    for (let i = 0; i < lastDay; i++) {
-      let today = [];
-      for (const entry of data) {
-        if (entry[0].getDate() - 1 == i) {
-          today = today.concat(entry.slice(1).join(" - "));
-        }
-      }
-      if ((i + firstDay) % 7 == 0) {
-        table += "<tr>";
-      }
-      table +=
-        "<td>" +
-        (today.length
-          ? `<details><summary>${i + 1}</summary>${today.join(
-              "<br>"
-            )}</details>`
-          : i + 1) +
-        "</td>";
-      if ((i + firstDay) % 7 == 6) {
-        table += "</tr>";
-      }
-    }
-    return table;
-  };
+  export let currentMonth = new Date();
 
-  const date = new Date();
+  const date = new Date(currentMonth.getTime());
   const firstDay = new Date(date.getFullYear(), date.getMonth(), 1).getDay();
   const lastDay = new Date(
     date.getFullYear(),
@@ -71,14 +41,12 @@
         {#each Array(cols) as _, j}
           <td>
             {#if typeof dateEntries[(i / cols) * cols + j] == "number"}
-              {dateEntries[(i / cols) * cols + j]}
+              <div class="circle">{dateEntries[(i / cols) * cols + j]}</div>
             {:else if dateEntries[(i / cols) * cols + j] == undefined}{" "}
             {:else}
-              <details>
-                <summary>{(i / cols) * cols + j}</summary>{dateEntries[
-                  (i / cols) * cols + j
-                ]}
-              </details>
+              <div class="circle with-details">
+                {(i / cols) * cols + j}
+              </div>
             {/if}
           </td>
         {/each}
@@ -90,5 +58,36 @@
 <style>
   #main-calendar {
     width: 70%;
+    background: rgba(159, 227, 153, 0.18);
+    box-shadow: 2px 4px 4px rgba(9, 186, 58, 0.25);
+    border-radius: 8px;
+    padding: 16px;
+  }
+  .circle {
+    background: #ffffff;
+    box-shadow: 1px 1px 5px #bcecb4;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    cursor: pointer;
+    transition: ease-in-out 0.2s;
+  }
+  .circle:hover {
+    box-shadow: rgba(9, 186, 58, 0.3) 2px 4px 4px;
+    background-color: #f5fff5;
+  }
+  td {
+    padding: 4px;
+    font-size: 20px;
+  }
+  .with-details {
+    background: #bcecb4;
+  }
+  .with-details:hover {
+    background: #dbffd5;
   }
 </style>

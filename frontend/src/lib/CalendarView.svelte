@@ -13,7 +13,7 @@
   const fetchData = (async () => {
     const response = await fetch("http://localhost:5000/timeline");
     const json = await response.json();
-    const today = new Date();
+    const today = new Date(currentMonth.getTime());
     const thisMonth = json
       .map(
         (entry: Array<string>) =>
@@ -65,7 +65,7 @@
       current.getFullYear();
   }
 
-  export let gardenPath = "";
+  export const gardenPath = ""; // TODO - for passing into backend later
   let monthDirection = true; // true for right, false for left
 </script>
 
@@ -87,7 +87,9 @@
     {#await fetchData}
       <p>...Waiting</p>
     {:then data}
-      <div id="main-wrapper"><Calendar {data} /></div>
+      {#key currentMonth}
+        <div id="main-wrapper"><Calendar {data} {currentMonth} /></div>
+      {/key}
     {:catch error}
       <p>Error! {error}</p>
     {/await}
@@ -140,5 +142,11 @@
     align-items: center;
     flex-direction: column;
     margin-top: 64px;
+  }
+  #main-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 32px;
   }
 </style>
