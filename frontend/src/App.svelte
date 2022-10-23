@@ -3,6 +3,7 @@
   import HomeView from "./lib/HomeView.svelte";
   import FindGardenView from "./lib/FindGardenView.svelte";
   import CalendarView from "./lib/CalendarView.svelte";
+  import DayView from "./lib/DayView.svelte";
 
   let url = "";
 
@@ -17,5 +18,6 @@
     <Route path="/calendar"
       ><CalendarView bind:gardenPath bind:currentMonth /></Route
     >
+    <Route path="/day"><DayView bind:gardenPath bind:currentMonth /></Route>
   </div>
 </Router>

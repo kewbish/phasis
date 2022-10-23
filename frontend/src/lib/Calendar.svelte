@@ -1,4 +1,7 @@
 <script lang="ts">
+  import { navigate } from "svelte-routing";
+  import DayView from "./DayView.svelte";
+
   export let data: Array<[Date, ...Array<string>]>;
 
   const toDateEntries = (data: Array<[Date, ...Array<string>]>) => {
@@ -44,9 +47,9 @@
               <div class="circle">{dateEntries[(i / cols) * cols + j]}</div>
             {:else if dateEntries[(i / cols) * cols + j] == undefined}{" "}
             {:else}
-              <div class="circle with-details">
-                {(i / cols) * cols + j}
-              </div>
+                <div class="circle with-details" on:click={() => navigate('/day')} on:keydown={() => navigate('/day')}>
+                  {(i / cols) * cols + j}
+                </div>
             {/if}
           </td>
         {/each}
