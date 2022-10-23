@@ -81,7 +81,7 @@
         {currentMonth
           .toLocaleString("default", { month: "long" })
           .toLowerCase()}
-        <span class="dark-green">{currentMonth.getFullYear()}</span>
+        <span class="dark-green"><em>{currentMonth.getFullYear()}</em></span>
       </h1>
     {/key}
     {#await fetchData}

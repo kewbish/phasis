@@ -19,6 +19,12 @@
     return entries;
   };
 
+  const navigateToDate = (i: number) => {
+    currentMonth.setDate(i);
+    currentMonth = new Date(currentMonth.getTime());
+    navigate("/day");
+  };
+
   export let currentMonth = new Date();
 
   const date = new Date(currentMonth.getTime());
@@ -47,9 +53,15 @@
               <div class="circle">{dateEntries[(i / cols) * cols + j]}</div>
             {:else if dateEntries[(i / cols) * cols + j] == undefined}{" "}
             {:else}
-                <div class="circle with-details" on:click={() => navigate('/day')} on:keydown={() => navigate('/day')}>
-                  {(i / cols) * cols + j}
-                </div>
+              <div
+                class="circle with-details"
+                on:click={() =>
+                  navigateToDate((i / cols) * cols + j - firstDay + 1)}
+                on:keydown={() =>
+                  navigateToDate((i / cols) * cols + j - firstDay + 1)}
+              >
+                {(i / cols) * cols + j - firstDay + 1}
+              </div>
             {/if}
           </td>
         {/each}
