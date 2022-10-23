@@ -1,5 +1,8 @@
 <script lang="ts">
+  import { Link } from "svelte-routing";
+
   export let currentMonth = new Date();
+  export let gardenPath: String;
 
   const fetchData = (async () => {
     const response = await fetch("http://localhost:5000/timeline");
@@ -11,7 +14,6 @@
           [new Date(entry[0]), ...entry.slice(1)] as [Date, ...Array<string>]
       )
       .filter((entry: [Date, ...Array<string>]) => {
-        console.log(entry);
         return entry[0].toDateString() == today.toDateString();
       });
     return thisMonth;
@@ -21,18 +23,35 @@
 <main>
   <div id="main-block">
     <h1>
-      ‹ {currentMonth
-        .toLocaleDateString("en-US", { month: "long", day: "numeric" })
-        .toLowerCase()}
-      <span class="dark-green">
-        <em>
-          {currentMonth.getFullYear()}
-        </em>
-      </span>
+      <Link to="/calendar">
+        ‹ {currentMonth
+          .toLocaleDateString("en-US", { month: "long", day: "numeric" })
+          .toLowerCase()}
+
+        <span class="dark-green">
+          <em>
+            {currentMonth.getFullYear()}
+          </em>
+        </span>
+      </Link>
     </h1>
     <div id="main-wrapper">
       <div id="files-list">
-        {#await fetchData}<p>Loading...</p>{:then data}<p>{data}</p>
+        {#await fetchData}<p>Loading...</p>{:then data}
+          <ul>
+            {#each data as entry}
+              <li>
+                <span class="dark-green">{gardenPath}/</span>{entry[1]} -
+                {#if entry[2] == "CREATE"}🌱
+                {:else if entry[2] == "MENTION"}
+                  🌼
+                {:else if entry[2] == "SICK"}🥀
+                {:else}
+                  💀
+                {/if}
+              </li>
+            {/each}
+          </ul>
         {:catch error}<p>Error! {error}</p>{/await}
       </div>
       <div id="file-preview">
@@ -83,5 +102,17 @@
     justify-content: center;
     align-items: center;
     height: 80%;
+  }
+  li {
+    margin-left: 24px;
+  }
+  :global(a) {
+      text-decoration: none;
+      color: black;
+      cursor: pointer;
+      transition: ease-in-out 0.2s;
+  }
+  :global(a):hover {
+    text-shadow: 2px 1px 1px #28763e75;
   }
 </style>
