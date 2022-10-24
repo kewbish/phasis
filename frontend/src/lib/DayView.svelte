@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Link } from "svelte-routing";
+  import { link } from "svelte-routing";
 
   export let currentMonth = new Date();
   export let gardenPath: String;
@@ -23,7 +23,7 @@
 <main>
   <div id="main-block">
     <h1>
-      <Link to="/calendar">
+      <a href="/calendar" use:link>
         ‹ {currentMonth
           .toLocaleDateString("en-US", { month: "long", day: "numeric" })
           .toLowerCase()}
@@ -33,7 +33,7 @@
             {currentMonth.getFullYear()}
           </em>
         </span>
-      </Link>
+      </a>
     </h1>
     <div id="main-wrapper">
       <div id="files-list">
@@ -106,13 +106,13 @@
   li {
     margin-left: 24px;
   }
-  :global(a) {
-      text-decoration: none;
-      color: black;
-      cursor: pointer;
-      transition: ease-in-out 0.2s;
+  a {
+    text-decoration: none;
+    color: black;
+    cursor: pointer;
+    transition: ease-in-out 0.2s;
   }
-  :global(a):hover {
+  a:hover {
     text-shadow: 2px 1px 1px #28763e75;
   }
 </style>

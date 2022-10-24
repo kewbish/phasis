@@ -2,7 +2,7 @@
   import { navigate } from "svelte-routing";
 
   const checkValidPath = (e: Event) => {
-    if (!path.trim()) {
+    if (!gardenPath.trim()) {
       e.preventDefault();
       document.getElementById("error").style.color = "black";
       return;
@@ -10,7 +10,7 @@
     navigate("/calendar");
   };
 
-  export let path = "";
+  export let gardenPath = "";
 </script>
 
 <main>
@@ -36,7 +36,7 @@
             fill="#B3F4AD"
           />
         </svg>
-        <input type="text" bind:value={path} id="text-input" />
+        <input type="text" bind:value={gardenPath} id="text-input" />
       </div>
       <input type="submit" value="go!" on:click={checkValidPath} />
     </div>
