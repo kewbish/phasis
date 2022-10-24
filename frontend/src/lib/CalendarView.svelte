@@ -65,7 +65,7 @@
       current.getFullYear();
   }
 
-  export const gardenPath = ""; // TODO - for passing into backend later
+  export const gardenPath: String = "";
   let monthDirection = true; // true for right, false for left
 </script>
 

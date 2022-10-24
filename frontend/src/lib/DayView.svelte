@@ -18,6 +18,20 @@
       });
     return thisMonth;
   })();
+
+  const shortenedGardenPath =
+    gardenPath.length > 30
+      ? gardenPath.slice(
+          0,
+          30 - gardenPath.split("\\").pop().split("/").pop().length
+        ) +
+        (gardenPath
+          .slice(0, 30 - gardenPath.split("\\").pop().split("/").pop().length)
+          .endsWith("/")
+          ? " "
+          : "/") +
+        gardenPath.split("\\").pop().split("/").pop()
+      : gardenPath;
 </script>
 
 <main>
@@ -41,7 +55,8 @@
           <ul>
             {#each data as entry}
               <li>
-                <span class="dark-green">{gardenPath}/</span>{entry[1]} -
+                <span class="dark-green">{shortenedGardenPath}/</span>{entry[1]}
+                -
                 {#if entry[2] == "CREATE"}🌱
                 {:else if entry[2] == "MENTION"}
                   🌼
