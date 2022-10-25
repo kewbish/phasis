@@ -14,7 +14,7 @@
 <Router {url}>
   <div>
     <Route path="/"><HomeView /></Route>
-    <Route path="/findGarden"><FindGardenView bind:path={gardenPath} /></Route>
+    <Route path="/findGarden"><FindGardenView bind:gardenPath /></Route>
     <Route path="/calendar"
       ><CalendarView bind:gardenPath bind:currentMonth /></Route
     >

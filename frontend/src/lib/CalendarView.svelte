@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Calendar from "./Calendar.svelte";
+  import Calendar from "./components/Calendar.svelte";
   import { fly } from "svelte/transition";
 
   const monthDiff = (dateFrom: Date, dateTo: Date) => {

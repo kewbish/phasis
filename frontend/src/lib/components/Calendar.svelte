@@ -1,6 +1,6 @@
 <script lang="ts">
   import { navigate } from "svelte-routing";
-  import DayView from "./DayView.svelte";
+  import DayView from "../DayView.svelte";
 
   export let data: Array<[Date, ...Array<string>]>;
 

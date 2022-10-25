@@ -1,5 +1,6 @@
 <script lang="ts">
   import { link } from "svelte-routing";
+  import EventIcon from "./components/EventIcon.svelte";
 
   export let currentMonth = new Date();
   export let gardenPath: String;
@@ -57,13 +58,7 @@
               <li>
                 <span class="dark-green">{shortenedGardenPath}/</span>{entry[1]}
                 -
-                {#if entry[2] == "CREATE"}🌱
-                {:else if entry[2] == "MENTION"}
-                  🌼
-                {:else if entry[2] == "SICK"}🥀
-                {:else}
-                  💀
-                {/if}
+                <EventIcon state={entry[2]} />
               </li>
             {/each}
           </ul>
