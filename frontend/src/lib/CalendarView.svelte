@@ -10,6 +10,8 @@
     );
   };
 
+  export let monthData: Array<[Date, ...Array<String>]> = [];
+
   const fetchData = (async () => {
     const response = await fetch("http://localhost:5000/timeline");
     const json = await response.json();
@@ -22,6 +24,7 @@
       .filter(
         (entry: [Date, ...Array<string>]) => monthDiff(entry[0], today) == 0
       );
+    monthData = thisMonth;
     return thisMonth;
   })();
 
