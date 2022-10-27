@@ -7,5 +7,5 @@
 </script>
 
 <main>
-  <SummaryView data={monthData} {gardenPath} {currentMonth} />
+  <SummaryView data={monthData} {gardenPath} {currentMonth} month={true} />
 </main>

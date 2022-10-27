@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { link } from "svelte-routing";
   import Calendar from "./components/Calendar.svelte";
   import { fly } from "svelte/transition";
 
@@ -80,12 +81,14 @@
   </div>
   <div id="main-block">
     {#key currentMonth}
-      <h1 in:fly={{ x: 50 * (monthDirection ? 1 : -1) }}>
-        {currentMonth
-          .toLocaleString("default", { month: "long" })
-          .toLowerCase()}
-        <span class="dark-green"><em>{currentMonth.getFullYear()}</em></span>
-      </h1>
+      <a href="/month" use:link>
+        <h1 in:fly={{ x: 50 * (monthDirection ? 1 : -1) }}>
+          {currentMonth
+            .toLocaleString("default", { month: "long" })
+            .toLowerCase()}
+          <span class="dark-green"><em>{currentMonth.getFullYear()}</em></span>
+        </h1>
+      </a>
     {/key}
     {#await fetchData}
       <p>...Waiting</p>
@@ -154,5 +157,14 @@
     align-items: center;
     justify-content: center;
     padding-top: 32px;
+  }
+  a {
+    text-decoration: none;
+    color: black;
+    cursor: pointer;
+    transition: ease-in-out 0.2s;
+  }
+  a:hover {
+    text-shadow: 2px 1px 1px #28763e75;
   }
 </style>

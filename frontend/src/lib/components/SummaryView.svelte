@@ -2,6 +2,8 @@
   import { link } from "svelte-routing";
   import EventIcon from "./EventIcon.svelte";
 
+  export let month: boolean;
+
   export let data: Array<[Date, ...Array<string>]> = [];
   export let currentMonth: Date;
   export let gardenPath: String;
@@ -26,7 +28,10 @@
     <h1>
       <a href="/calendar" use:link>
         ‹ {currentMonth
-          .toLocaleDateString("en-US", { month: "long", day: "numeric" })
+          .toLocaleDateString("en-US", {
+            month: "long",
+            ...(!month && { day: "numeric" }),
+          })
           .toLowerCase()}
 
         <span class="dark-green">
