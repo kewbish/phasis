@@ -80,16 +80,16 @@
     {/key}
   </div>
   <div id="main-block">
-    {#key currentMonth}
-      <a href="/month" use:link>
+    <a href="/month" use:link>
+      {#key currentMonth}
         <h1 in:fly={{ x: 50 * (monthDirection ? 1 : -1) }}>
           {currentMonth
             .toLocaleString("default", { month: "long" })
             .toLowerCase()}
           <span class="dark-green"><em>{currentMonth.getFullYear()}</em></span>
         </h1>
-      </a>
-    {/key}
+      {/key}
+    </a>
     {#await fetchData}
       <p>...Waiting</p>
     {:then data}

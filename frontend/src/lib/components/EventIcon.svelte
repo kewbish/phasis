@@ -27,6 +27,7 @@
     display: inline-block;
     border-bottom: dotted 2px #406e45;
     transition: ease-in-out 0.2s;
+    text-shadow: none;
   }
 
   .tooltip > .tooltiptext {
@@ -50,6 +51,7 @@
 
   .tooltip:hover > .tooltiptext {
     visibility: visible;
+    text-shadow: none;
   }
 
   .tooltip .tooltiptext::after {

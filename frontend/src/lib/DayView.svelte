@@ -24,7 +24,7 @@
   {#await fetchData}
     <p>Loading...</p>
   {:then data}
-    <SummaryView {data} {gardenPath} {currentMonth} />
+    <SummaryView {data} {gardenPath} {currentMonth} month={false} />
   {:catch error}
     <p>Error! {error}</p>
   {/await}
