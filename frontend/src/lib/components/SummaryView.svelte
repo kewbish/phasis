@@ -7,6 +7,14 @@
   export let data: Array<[Date, ...Array<string>]> = [];
   export let currentMonth: Date;
   export let gardenPath: String;
+  let filter = "";
+
+  const FILTER_MAP = {
+    CREATE: "🌱",
+    MENTION: "🌼",
+    SICK: "🥀",
+    DEATH: "💀",
+  };
 
   const shortenedGardenPath =
     gardenPath.length > 30
@@ -46,19 +54,61 @@
         <div id="header-picker">
           <p>{month ? "This month" : "That day"}...</p>
           <div id="picker">
-            <p class="picker-item">🌱</p>
-            <p class="picker-item">🌼</p>
-            <p class="picker-item">🥀</p>
-            <p class="picker-item">💀</p>
+            <p
+              class="picker-item"
+              on:click={() => {
+                filter = filter == "🌱" ? "" : "🌱";
+              }}
+              on:keydown={() => {
+                filter = filter == "🌱" ? "" : "🌱";
+              }}
+            >
+              🌱
+            </p>
+            <p
+              class="picker-item"
+              on:click={() => {
+                filter = filter == "🌼" ? "" : "🌼";
+              }}
+              on:keydown={() => {
+                filter = filter == "🌼" ? "" : "🌼";
+              }}
+            >
+              🌼
+            </p>
+            <p
+              class="picker-item"
+              on:click={() => {
+                filter = filter == "🥀" ? "" : "🥀";
+              }}
+              on:keydown={() => {
+                filter = filter == "🥀" ? "" : "🥀";
+              }}
+            >
+              🥀
+            </p>
+            <p
+              class="picker-item"
+              on:click={() => {
+                filter = filter == "💀" ? "" : "💀";
+              }}
+              on:keydown={() => {
+                filter = filter == "💀" ? "" : "💀";
+              }}
+            >
+              💀
+            </p>
           </div>
         </div>
         <ul>
           {#each data as entry}
-            <li>
-              <span class="dark-green">{shortenedGardenPath}/</span>{entry[1]}
-              -
-              <EventIcon state={entry[2]} />
-            </li>
+            {#if !filter || FILTER_MAP[entry[2]] == filter}
+              <li>
+                <span class="dark-green">{shortenedGardenPath}/</span>{entry[1]}
+                -
+                <EventIcon state={entry[2]} />
+              </li>
+            {/if}
           {/each}
         </ul>
       </div>
