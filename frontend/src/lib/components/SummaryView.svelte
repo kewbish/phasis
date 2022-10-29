@@ -43,6 +43,15 @@
     </h1>
     <div id="main-wrapper">
       <div id="files-list">
+        <div id="header-picker">
+          <p>{month ? "This month" : "That day"}...</p>
+          <div id="picker">
+            <p class="picker-item">🌱</p>
+            <p class="picker-item">🌼</p>
+            <p class="picker-item">🥀</p>
+            <p class="picker-item">💀</p>
+          </div>
+        </div>
         <ul>
           {#each data as entry}
             <li>
@@ -113,5 +122,38 @@
   }
   a:hover {
     text-shadow: 2px 1px 1px #28763e75;
+  }
+  ul {
+    padding-top: 8px;
+  }
+  #header-picker {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+  #picker {
+    position: relative;
+    border-radius: 8px;
+    padding: 8px;
+    display: flex;
+    flex-direction: row;
+    gap: 2px;
+  }
+  #picker::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 8px;
+    padding: 2px;
+    background: linear-gradient(180deg, #bcecb4 0%, #88d08159 100%),
+      linear-gradient(0deg, #e0ffdd, #e0ffdd);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+  }
+  .picker-item {
+    z-index: 1;
+    cursor: pointer;
   }
 </style>

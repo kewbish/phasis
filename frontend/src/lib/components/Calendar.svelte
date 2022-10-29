@@ -88,7 +88,6 @@
     align-items: center;
     justify-content: center;
     margin: 0 auto;
-    cursor: pointer;
     transition: ease-in-out 0.2s;
   }
   .circle:hover {
@@ -101,6 +100,7 @@
   }
   .with-details {
     background: #bcecb4;
+    cursor: pointer;
   }
   .with-details:hover {
     background: #dbffd5;

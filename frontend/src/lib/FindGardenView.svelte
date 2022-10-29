@@ -90,6 +90,7 @@
     display: flex;
     flex-direction: row;
     align-items: center;
+    position: relative;
   }
   #textbox::before {
     content: "";
