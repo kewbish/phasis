@@ -55,7 +55,7 @@
           <p>{month ? "This month" : "That day"}...</p>
           <div id="picker">
             <p
-              class="picker-item"
+              class={"picker-item" + (filter == "🌱" ? " selected" : "")}
               on:click={() => {
                 filter = filter == "🌱" ? "" : "🌱";
               }}
@@ -66,7 +66,7 @@
               🌱
             </p>
             <p
-              class="picker-item"
+              class={"picker-item" + (filter == "🌼" ? " selected" : "")}
               on:click={() => {
                 filter = filter == "🌼" ? "" : "🌼";
               }}
@@ -77,7 +77,7 @@
               🌼
             </p>
             <p
-              class="picker-item"
+              class={"picker-item" + (filter == "🥀" ? " selected" : "")}
               on:click={() => {
                 filter = filter == "🥀" ? "" : "🥀";
               }}
@@ -88,7 +88,7 @@
               🥀
             </p>
             <p
-              class="picker-item"
+              class={"picker-item" + (filter == "💀" ? " selected" : "")}
               on:click={() => {
                 filter = filter == "💀" ? "" : "💀";
               }}
@@ -205,5 +205,11 @@
   .picker-item {
     z-index: 1;
     cursor: pointer;
+    box-sizing: border-box;
+    border-bottom: solid 2px transparent;
+    transition: ease-in-out 0.2s;
+  }
+  .selected {
+    border-bottom: dotted 2px #406e45;
   }
 </style>
