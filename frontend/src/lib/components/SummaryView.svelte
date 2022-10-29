@@ -5,6 +5,8 @@
   export let month: boolean;
 
   export let data: Array<[Date, ...Array<string>]> = [];
+  let filteredData: Array<[Date, ...Array<string>]> = [];
+
   export let currentMonth: Date;
   export let gardenPath: String;
   let filter = "";
@@ -29,6 +31,10 @@
           : "/") +
         gardenPath.split("\\").pop().split("/").pop()
       : gardenPath;
+
+  $: filteredData = data.filter(
+    (entry) => !filter || FILTER_MAP[entry[2]] == filter
+  );
 </script>
 
 <main>
@@ -101,15 +107,16 @@
           </div>
         </div>
         <ul>
-          {#each data as entry}
-            {#if !filter || FILTER_MAP[entry[2]] == filter}
-              <li>
-                <span class="dark-green">{shortenedGardenPath}/</span>{entry[1]}
-                -
-                <EventIcon state={entry[2]} />
-              </li>
-            {/if}
+          {#each filteredData as entry}
+            <li>
+              <span class="dark-green">{shortenedGardenPath}/</span>{entry[1]}
+              -
+              <EventIcon state={entry[2]} />
+            </li>
           {/each}
+          {#if !filteredData.length}
+            <p class="dark-green">No {filter}'ed files found.</p>
+          {/if}
         </ul>
       </div>
       <div id="file-preview">
