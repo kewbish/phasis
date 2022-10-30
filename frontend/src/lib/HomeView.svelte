@@ -29,20 +29,6 @@
     gap: 12px;
     transform: translateY(-50%);
   }
-  button {
-    background: #9fe399;
-    box-shadow: 2px 4px 4px rgba(9, 186, 58, 0.25);
-    border-radius: 8px;
-    border: 0;
-    padding: 8px 16px;
-    font-size: larger;
-    transition: ease-in-out 0.2s;
-    cursor: pointer;
-  }
-  button:hover {
-    background: #88d081;
-    padding: 12px 20px;
-  }
   #experiment {
     position: absolute;
     bottom: 2%;
@@ -50,5 +36,19 @@
   }
   #experiment > a {
     color: black;
+  }
+  button {
+    font-size: larger;
+    background: #9fe399;
+    box-shadow: 2px 4px 4px rgba(9, 186, 58, 0.25);
+    border-radius: 8px;
+    border: 0;
+    padding: 8px 16px;
+    transition: ease-in-out 0.2s;
+    cursor: pointer;
+  }
+  button:hover {
+    background: #88d081;
+    padding: 12px 20px;
   }
 </style>

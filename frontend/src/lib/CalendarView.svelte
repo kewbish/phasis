@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { link } from "svelte-routing";
+  import { link, navigate } from "svelte-routing";
   import Calendar from "./components/Calendar.svelte";
   import { fly } from "svelte/transition";
 
@@ -40,6 +40,9 @@
     currentMonth.setMonth(currentMonth.getMonth() + 1);
     currentMonth = new Date(currentMonth.getTime());
     monthDirection = true;
+  };
+  const goTimeline = () => {
+    navigate("/timeline");
   };
 
   let previousMonth: String;
@@ -94,7 +97,12 @@
       <p>...Waiting</p>
     {:then data}
       {#key currentMonth}
-        <div id="main-wrapper"><Calendar {data} {currentMonth} /></div>
+        <div id="main-wrapper">
+          <Calendar {data} {currentMonth} />
+          <button on:click={goTimeline} on:keydown={goTimeline}
+            >timeline view</button
+          >
+        </div>
       {/key}
     {:catch error}
       <p>Error! {error}</p>
@@ -120,9 +128,6 @@
     width: 100vw;
     display: grid;
     grid-template-columns: 1fr 2fr 1fr;
-  }
-  #main-wrapper {
-    width: 100%;
   }
   #to-next > h2,
   #to-prev > h2 {
@@ -153,10 +158,13 @@
     margin-top: 20%;
   }
   #main-wrapper {
+    width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
     padding-top: 32px;
+    flex-direction: column;
+    gap: 16px;
   }
   a {
     text-decoration: none;
@@ -166,5 +174,18 @@
   }
   a:hover {
     text-shadow: 2px 1px 1px #28763e75;
+  }
+  button {
+    background: rgba(159, 227, 153, 0.18);
+    box-shadow: 2px 4px 4px rgba(9, 186, 58, 0.25);
+    border-radius: 8px;
+    border: 0;
+    padding: 8px 16px;
+    transition: ease-in-out 0.2s;
+    cursor: pointer;
+  }
+  button:hover {
+    background: rgba(159, 227, 153, 0.35);
+    padding: 12px 20px;
   }
 </style>

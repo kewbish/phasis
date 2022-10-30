@@ -22,6 +22,7 @@
     "vite": "^3.1.0"
   },
   "dependencies": {
+    "svelte-infinite-scroll": "^2.0.1",
     "svelte-routing": "^1.6.0"
   }
 }

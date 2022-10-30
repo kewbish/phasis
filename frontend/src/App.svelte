@@ -5,6 +5,7 @@
   import CalendarView from "./lib/CalendarView.svelte";
   import DayView from "./lib/DayView.svelte";
   import MonthView from "./lib/MonthView.svelte";
+  import TimelineView from "./lib/TimelineView.svelte";
 
   let url = "";
 
@@ -23,6 +24,9 @@
     <Route path="/day"><DayView bind:gardenPath bind:currentMonth /></Route>
     <Route path="/month"
       ><MonthView bind:gardenPath bind:currentMonth bind:monthData /></Route
+    >
+    <Route path="/timeline"
+      ><TimelineView bind:gardenPath bind:currentMonth bind:monthData /></Route
     >
   </div>
 </Router>
