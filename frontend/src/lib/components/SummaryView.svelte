@@ -134,9 +134,6 @@
     height: 100vh;
     width: 100vw;
   }
-  .dark-green {
-    color: #406e45;
-  }
   #main-block {
     width: 80%;
     padding: 5% 0;
