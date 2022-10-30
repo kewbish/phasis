@@ -1,5 +1,6 @@
 <script lang="ts">
   import InfiniteScroll from "svelte-infinite-scroll";
+  import { navigate } from "svelte-routing";
 
   export let currentMonth: Date = new Date();
 
@@ -7,6 +8,10 @@
   let size = 3;
   let timelineData = [];
   export let monthData: Array<[Date, ...Array<String>]> = [];
+
+  const goCalendar = () => {
+    navigate("/calendar");
+  };
 
   $: timelineData = [
     ...timelineData,
@@ -42,6 +47,7 @@
       </div>
     {/each}
   </div>
+  <button on:click={goCalendar} on:keydown={goCalendar}>calendar view</button>
   <InfiniteScroll threshold={10} on:loadMore={() => page++} />
   <div id="to-prev">
     <h2>‹</h2>
@@ -59,28 +65,29 @@
     align-items: center;
     height: 100vh;
     width: 100vw;
-    gap: 54px;
+    gap: 16px;
     overflow-x: hidden;
   }
   main > h1 {
-    padding: 10% 0 0;
+    padding: 10% 0 32px;
   }
   #timeline {
     display: flex;
     flex-direction: row;
     width: 100%;
     justify-content: space-evenly;
+    height: max-content;
   }
   .entry {
     flex: 1;
+    height:max-content;
   }
   .entry > .entry-info {
     background: rgba(159, 227, 153, 0.18);
     box-shadow: 2px 4px 4px rgba(9, 186, 58, 0.25);
     border-radius: 8px;
     margin: 16px;
-    padding: 16px;
-    height: 60%;
+    padding: 48px 16px;
     display: flex;
     align-items: center;
   }
@@ -121,11 +128,11 @@
   }
   #to-next {
     right: 0;
-    text-align:right;
+    text-align: right;
   }
   #to-next > h2,
   #to-prev > h2 {
-  font-size: xx-large;
+    font-size: xx-large;
     margin: 110% 16px 16px;
     color: #808080;
     transition: ease-in-out 0.2s;
@@ -149,5 +156,19 @@
     top: 0;
     left: 0;
     z-index: 1;
+  }
+  button {
+    background: rgba(159, 227, 153, 0.18);
+    box-shadow: 2px 4px 4px rgba(9, 186, 58, 0.25);
+    border-radius: 8px;
+    border: 0;
+    padding: 8px 16px;
+    transition: ease-in-out 0.2s;
+    cursor: pointer;
+    z-index:3;
+  }
+  button:hover {
+    background: rgba(159, 227, 153, 0.35);
+    padding: 12px 20px;
   }
 </style>
