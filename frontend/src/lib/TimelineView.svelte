@@ -43,6 +43,13 @@
     {/each}
   </div>
   <InfiniteScroll threshold={10} on:loadMore={() => page++} />
+  <div id="to-prev">
+    <h2>‹</h2>
+  </div>
+  <div id="to-next">
+    <h2>›</h2>
+  </div>
+  <div id="navigation-overlay" />
 </main>
 
 <style>
@@ -52,7 +59,7 @@
     align-items: center;
     height: 100vh;
     width: 100vw;
-    gap: 32px;
+    gap: 54px;
     overflow-x: hidden;
   }
   main > h1 {
@@ -99,5 +106,48 @@
   }
   .entry > .entry-info > h3 {
     color: #a4a4a4;
+  }
+  #to-next,
+  #to-prev {
+    position: absolute;
+    cursor: pointer;
+    height: 100vh;
+    width: 10%;
+    z-index: 2;
+    padding: 0 16px;
+  }
+  #to-prev {
+    left: 0;
+  }
+  #to-next {
+    right: 0;
+    text-align:right;
+  }
+  #to-next > h2,
+  #to-prev > h2 {
+  font-size: xx-large;
+    margin: 110% 16px 16px;
+    color: #808080;
+    transition: ease-in-out 0.2s;
+  }
+  #to-next:hover > h2,
+  #to-prev:hover > h2 {
+    font-size: 40px;
+    color: #406e45;
+  }
+  #navigation-overlay {
+    background: linear-gradient(
+      90deg,
+      rgba(179, 244, 173, 0.44) 0%,
+      rgba(255, 255, 255, 0) 30%,
+      rgba(255, 255, 255, 0) 70%,
+      rgba(179, 244, 173, 0.44) 100%
+    );
+    height: 100vh;
+    width: 100vw;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
   }
 </style>
