@@ -1,10 +1,11 @@
 <script lang="ts">
   import InfiniteScroll from "svelte-infinite-scroll";
   import { navigate } from "svelte-routing";
+  import { onMount } from "svelte";
 
   export let currentMonth: Date = new Date();
 
-  let page = 0;
+  let page = 1;
   let size = 5;
   let timelineData = [];
   export let monthData: Array<[Date, ...Array<String>]> = [];
@@ -19,6 +20,10 @@
   ];
 
   let timelineElement: HTMLDivElement;
+
+  onMount(async () => {
+    timelineElement.scrollLeft += timelineElement.clientWidth;
+  });
 </script>
 
 <main>
