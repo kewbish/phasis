@@ -114,8 +114,11 @@
               <EventIcon state={entry[2]} />
             </li>
           {/each}
-          {#if !filteredData.length}
+          {#if !filteredData.length && data.length}
             <p class="dark-green">No {filter}'ed files found.</p>
+          {/if}
+          {#if !data.length}
+            <p class="dark-green">No file events found.</p>
           {/if}
         </ul>
       </div>

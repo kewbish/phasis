@@ -5,7 +5,7 @@
   export let currentMonth: Date = new Date();
 
   let page = 0;
-  let size = 3;
+  let size = 5;
   let timelineData = [];
   export let monthData: Array<[Date, ...Array<String>]> = [];
 
@@ -17,6 +17,8 @@
     ...timelineData,
     ...monthData.splice(size * page, size * (page + 1) - 1),
   ];
+
+  let timelineElement: HTMLDivElement;
 </script>
 
 <main>
@@ -33,7 +35,7 @@
       </em>
     </span>
   </h1>
-  <div id="timeline">
+  <div id="timeline" bind:this={timelineElement}>
     {#each timelineData as entry}
       <div class="entry">
         <div class="entry-header">
@@ -46,9 +48,14 @@
         </div>
       </div>
     {/each}
+    <InfiniteScroll
+      threshold={10}
+      on:loadMore={() => page++}
+      horizontal={true}
+      elementScroll={timelineElement}
+    />
   </div>
   <button on:click={goCalendar} on:keydown={goCalendar}>calendar view</button>
-  <InfiniteScroll threshold={10} on:loadMore={() => page++} />
   <div id="to-prev">
     <h2>‹</h2>
   </div>
@@ -73,20 +80,20 @@
   }
   #timeline {
     display: flex;
-    flex-direction: row;
+    overflow-y: hidden;
     width: 100%;
-    justify-content: space-evenly;
     height: max-content;
+    z-index: 3;
   }
   .entry {
-    flex: 1;
-    height:max-content;
+    min-width: 33.3333%;
+    height: max-content;
   }
   .entry > .entry-info {
     background: rgba(159, 227, 153, 0.18);
     box-shadow: 2px 4px 4px rgba(9, 186, 58, 0.25);
     border-radius: 8px;
-    margin: 16px;
+    margin: 16px 32px;
     padding: 48px 16px;
     display: flex;
     align-items: center;
@@ -165,7 +172,7 @@
     padding: 8px 16px;
     transition: ease-in-out 0.2s;
     cursor: pointer;
-    z-index:3;
+    z-index: 3;
   }
   button:hover {
     background: rgba(159, 227, 153, 0.35);
