@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { onMount } from "svelte";
+
   import { navigate } from "svelte-routing";
 
   const checkValidPath = (e: Event) => {
@@ -10,7 +12,13 @@
     navigate("/calendar");
   };
 
-  export let gardenPath = "";
+  export let gardenPath: String;
+
+  onMount(() => {
+    if (gardenPath !== "/") {
+      navigate("/calendar");
+    }
+  });
 </script>
 
 <main>

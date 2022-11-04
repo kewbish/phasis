@@ -71,8 +71,6 @@
       " " +
       current.getFullYear();
   }
-
-  export const gardenPath: String = "";
   let monthDirection = true; // true for right, false for left
 </script>
 
