@@ -42,6 +42,7 @@
     z-index: 1;
     margin-top: -40%;
     margin-left: 8px;
+    font-weight: 400;
   }
 
   .tooltip:hover {

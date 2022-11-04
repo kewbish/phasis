@@ -2,13 +2,14 @@
   import InfiniteScroll from "svelte-infinite-scroll";
   import { navigate } from "svelte-routing";
   import { onMount } from "svelte";
+  import EventIcon from "./components/EventIcon.svelte";
 
   export let currentMonth: Date = new Date();
-
-  let page = 1;
-  let size = 5;
-  let timelineData = [];
   export let monthData: Array<[Date, ...Array<String>]> = [];
+
+  let size = 5;
+  let page = 0;
+  let timelineData = [];
 
   const goCalendar = () => {
     navigate("/calendar");
@@ -20,10 +21,6 @@
   ];
 
   let timelineElement: HTMLDivElement;
-
-  onMount(async () => {
-    timelineElement.scrollLeft += timelineElement.clientWidth;
-  });
 </script>
 
 <main>
@@ -31,7 +28,6 @@
     {currentMonth
       .toLocaleDateString("en-US", {
         month: "long",
-        day: "numeric",
       })
       .toLowerCase()}
     <span class="dark-green">
@@ -44,7 +40,7 @@
     {#each timelineData as entry}
       <div class="entry">
         <div class="entry-header">
-          <h3>{entry[1]}</h3>
+          <h3>{entry[1]} <EventIcon state={entry[2]} /></h3>
         </div>
         <div class="vl" />
         <div class="hl" />
@@ -89,6 +85,19 @@
     width: 100%;
     height: max-content;
     z-index: 3;
+    scrollbar-width: none;
+  }
+  #timeline::-webkit-scrollbar {
+    display: none;
+  }
+  #timeline > :global(:nth-child(1)) {
+    margin-left: 15%;
+  }
+  #timeline > :global(:nth-child(1) > .hl) {
+    border-image: linear-gradient(to left, #406e45, #ffffff00) 1;
+  }
+  #timeline > :global(:nth-last-child(-n + 1) > .hl) {
+    border-image: linear-gradient(to right, #406e45, #ffffff00) 1;
   }
   .entry {
     min-width: 33.3333%;
