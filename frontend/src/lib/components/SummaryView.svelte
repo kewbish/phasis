@@ -1,6 +1,7 @@
 <script lang="ts">
   import { link } from "svelte-routing";
   import EventIcon from "./EventIcon.svelte";
+  import Preview from "./Preview.svelte";
 
   export let month: boolean;
 
@@ -10,6 +11,11 @@
   export let currentMonth: Date;
   export let gardenPath: String;
   let filter = "";
+  let lastClickedPath = "";
+
+  const setLastClickedPath = (path: string) => {
+    lastClickedPath = path;
+  };
 
   const FILTER_MAP = {
     CREATE: "🌱",
@@ -108,7 +114,10 @@
         </div>
         <ul>
           {#each filteredData as entry}
-            <li>
+            <li
+              on:click={() => setLastClickedPath(entry[1])}
+              on:keydown={() => setLastClickedPath(entry[1])}
+            >
               <span class="dark-green">{shortenedGardenPath}/</span>{entry[1]}
               -
               <EventIcon state={entry[2]} />
@@ -122,8 +131,12 @@
           {/if}
         </ul>
       </div>
-      <div id="file-preview">
-        <h1>‹ preview ›</h1>
+      <div id="file-preview" class={lastClickedPath.length ? " flex-top" : ""}>
+        {#if !lastClickedPath.length}
+          <h1>‹ preview ›</h1>
+        {:else}
+          <Preview bind:path={lastClickedPath} />
+        {/if}
       </div>
     </div>
   </div>
@@ -160,6 +173,7 @@
     box-shadow: 2px 4px 4px rgba(9, 186, 58, 0.25);
     border-radius: 8px;
     padding: 24px;
+    min-width: 0;
   }
   #file-preview {
     color: #a4a4a4;
@@ -167,6 +181,10 @@
     justify-content: center;
     align-items: center;
     height: 80%;
+  }
+  .flex-top {
+    align-items: start !important;
+    height: fit-content !important;
   }
   li {
     margin-left: 24px;
@@ -218,5 +236,8 @@
   }
   .selected {
     border-bottom: dotted 2px #406e45;
+  }
+  li {
+    cursor: pointer;
   }
 </style>

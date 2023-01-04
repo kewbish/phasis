@@ -13,7 +13,7 @@
 
   export let monthData: Array<[Date, ...Array<String>]> = [];
 
-  const fetchData = (async () => {
+  const fetchData = async () => {
     const response = await fetch("http://localhost:5000/timeline");
     const json = await response.json();
     const today = new Date(currentMonth.getTime());
@@ -27,7 +27,14 @@
       );
     monthData = thisMonth;
     return thisMonth;
-  })();
+  };
+  let newData = fetchData();
+
+  $: {
+    if (currentMonth) {
+      newData = fetchData();
+    }
+  }
 
   export let currentMonth = new Date();
 
@@ -91,7 +98,7 @@
         </h1>
       {/key}
     </a>
-    {#await fetchData}
+    {#await newData}
       <p>...Waiting</p>
     {:then data}
       {#key currentMonth}
