@@ -180,6 +180,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
     height: 80%;
   }
   .flex-top {

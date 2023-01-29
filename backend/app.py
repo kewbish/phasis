@@ -5,7 +5,7 @@ from flask_caching import Cache
 
 path.append("../")
 
-from phasis import gen_timeline, DIR
+from phasis import gen_timeline, DIR, git_commit_diffs, fetch_from_chatgpt
 
 app = Flask(__name__)
 app.config.from_object(__name__)
@@ -26,6 +26,27 @@ def json_timeline():
 def json_contents():
     path = request.args.get("path")
     return jsonify({"contents": open(DIR + path).read() if path else ""})
+
+
+@app.route("/commits", methods=["Get"])
+@cache.cached(timeout=300)
+def json_commits():
+    path = request.args.get("path")
+    if not path:
+        return jsonify({"error": "No path"})
+    return jsonify(
+        {"diffs": [{"sha": diff.revision, "message": diff.message} for diff in git_commit_diffs(DIR + path, 5)]}
+    )
+
+
+@app.route("/fetch_commit", methods=["Get"])
+@cache.cached(timeout=300)
+def fetch_content():
+    path = request.args.get("path")
+    # TODO: fetch with given SHA
+    if not path:
+        return jsonify({"error": "No path"})
+    return jsonify({"message": fetch_from_chatgpt(git_commit_diffs(DIR + path, 1)[0])})
 
 
 if __name__ == "__main__":

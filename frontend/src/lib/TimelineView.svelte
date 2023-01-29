@@ -49,12 +49,7 @@
         </div>
       </div>
     {/each}
-    <InfiniteScroll
-      threshold={10}
-      on:loadMore={() => page++}
-      horizontal={true}
-      elementScroll={timelineElement}
-    />
+    <InfiniteScroll threshold={10} on:loadMore={() => page++} />
   </div>
   <button on:click={goCalendar} on:keydown={goCalendar}>calendar view</button>
   <div id="to-prev">
@@ -82,8 +77,10 @@
   #timeline {
     display: flex;
     overflow-y: hidden;
+    overflow-x: scroll;
     width: 100%;
     height: max-content;
+    max-height: max-content;
     z-index: 3;
     scrollbar-width: none;
   }

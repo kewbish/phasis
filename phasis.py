@@ -9,8 +9,12 @@ from yaspin import yaspin
 import click
 import warnings
 from colorama import init, Fore
-from git import Repo
+from git import Diff
+from git.repo import Repo
 from typing import List, Tuple
+from dataclasses import dataclass
+from revChatGPT.ChatGPT import Chatbot
+from json import loads
 
 DIR = "/home/kewbish/EVB/dev/lc/"
 warnings.filterwarnings(
@@ -62,6 +66,14 @@ class Phasis:
             self.timeline = timeline
 
             self.spinner.stop()
+
+
+@dataclass()
+class PhasisDiff:
+    revision: str
+    message: str
+    diff_contents_a: str | None = None
+    diff_contents_b: str | None = None
 
 
 def fore_from_hex(hexcode: str) -> str:
@@ -175,6 +187,63 @@ def git_time_travel():
         print(key)
         for v in value:
             print(f"    - {v} {fore_from_hex('#91DDF2')}(mention){Fore.RESET}")
+
+
+@cli.command(name="gitcd")
+@click.option("--path", help="Path of file to search commits for")
+@click.option("--amt", default=5, help="Amount of commits to return")
+def click_git_commit_diffs(path: str, amt: int):
+    print("\n".join([pdiff.__repr__() for pdiff in git_commit_diffs(path, amt)]))
+
+
+def git_commit_diffs(path: str, amt: int) -> List[PhasisDiff]:
+    CONVERT_TO_RELATIVE_FS = "/".join(DIR.split("/")[:-3])
+    repo = Repo.init(CONVERT_TO_RELATIVE_FS)
+    recent_commits = list(repo.iter_commits("master", max_count=amt, paths=path))
+    pdiffs = []
+    for commit in recent_commits:
+        diffs = commit.diff(commit.parents[0])
+        diffs: List[Diff] = list(
+            filter(lambda diff_f: diff_f.a_path == path.replace(CONVERT_TO_RELATIVE_FS + "/", ""), diffs)
+        )
+        if len(diffs) <= 0:
+            return
+        pdiff = PhasisDiff(commit.hexsha, commit.message)
+        a_blob_stream = diffs[0].a_blob
+        if a_blob_stream:
+            pdiff.diff_contents_a = a_blob_stream.data_stream.read().decode("utf-8")
+        b_blob_stream = diffs[0].b_blob
+        if b_blob_stream:
+            pdiff.diff_contents_a = b_blob_stream.data_stream.read().decode("utf-8")
+        pdiffs += [pdiff]
+    return pdiffs
+
+
+@cli.command(name="gitfd")
+@click.option("--path", help="Path of file to search commits for")
+def click_git_fetch_diff(path: str):
+    diffs = git_commit_diffs(path, 1)
+    print(fetch_from_chatgpt(diffs[0]))
+
+
+def fetch_from_chatgpt(diff: PhasisDiff) -> str:
+    def read_secret() -> str:
+        with open("./config.json") as x:
+            raw_json = x.read()
+            json = loads(raw_json)
+            return json["session_token"]
+
+    chatbot = Chatbot({"session_token": read_secret()}, conversation_id=None, parent_id=None)
+    prompt = f"""Summarize in {"four" if diff.diff_contents_a and diff.diff_contents_b else "three"} sentences how the ideas of the two notes below differ. The notes are labelled "The first note" and "The second note" below.
+
+The first note: "{diff.diff_contents_a[:700] if diff.diff_contents_a else ''}"
+
+The second note: "{diff.diff_contents_b[:700] if diff.diff_contents_b else ''}"
+    """
+    response = chatbot.ask(prompt, conversation_id=None, parent_id=None)
+    if not response:
+        return ""
+    return response["message"]
 
 
 if __name__ == "__main__":

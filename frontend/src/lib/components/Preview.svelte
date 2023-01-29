@@ -1,4 +1,6 @@
 <script lang="ts">
+  import CommitsList from "./CommitsList.svelte";
+
   export let path: string = "";
 
   const fetchContents = async () => {
@@ -23,6 +25,7 @@
   <pre>
 {contents}
 </pre>
+  <CommitsList bind:filePath={path} />
 {/await}
 
 <style>
