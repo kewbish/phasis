@@ -26,6 +26,10 @@
 
   $: timelineData = [...timelineData, ...newBatch];
 
+  const goEvent = (entry: [Date, ...Array<string>]) => {
+    navigate(`/day?day=${+entry[0]}&file=${entry[1]}`);
+  };
+
   let timelineElement: HTMLDivElement;
 </script>
 
@@ -51,7 +55,18 @@
         <div class="vl" />
         <div class="hl" />
         <div class="entry-info">
-          <h3>‹ {entry} ›</h3>
+          <h3>
+            ‹ On {entry[0].toLocaleDateString(undefined, {
+              weekday: "long",
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })} ›
+          </h3>
+          <button
+            on:click={() => goEvent(entry)}
+            on:keydown={() => goEvent(entry)}>view event</button
+          >
         </div>
       </div>
     {/each}
@@ -122,9 +137,18 @@
     box-shadow: 2px 4px 4px rgba(9, 186, 58, 0.25);
     border-radius: 8px;
     margin: 16px 32px;
-    padding: 48px 16px;
+    padding: 32px 16px;
     display: flex;
+    flex-direction: column;
     align-items: center;
+  }
+  .entry-info > h3 {
+    text-align: center;
+    width: 100%;
+  }
+  .entry-info > button {
+    margin-top: 0.5rem;
+    border: 1px solid #b8d6c0;
   }
   .entry > .entry-header {
     background: rgba(159, 227, 153, 0.18);

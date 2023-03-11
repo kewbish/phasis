@@ -4,6 +4,8 @@
   import Preview from "./Preview.svelte";
 
   export let month: boolean;
+  export let returnPath: string = "/calendar";
+  export let file: string;
 
   export let data: Array<[Date, ...Array<string>]> = [];
   let filteredData: Array<[Date, ...Array<string>]> = [];
@@ -11,7 +13,7 @@
   export let currentMonth: Date;
   export let gardenPath: String;
   let filter = "";
-  let lastClickedPath = "";
+  let lastClickedPath = file;
 
   const setLastClickedPath = (path: string) => {
     lastClickedPath = path;
@@ -46,7 +48,7 @@
 <main>
   <div id="main-block">
     <h1>
-      <a href="/calendar" use:link>
+      <a href={returnPath} use:link>
         ‹ {currentMonth
           .toLocaleDateString("en-US", {
             month: "long",
