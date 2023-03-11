@@ -1,3 +1,4 @@
+from datetime import datetime
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from sys import path
@@ -35,8 +36,16 @@ def json_commits():
     path = request.args.get("path")
     if not path:
         return jsonify({"error": "No path"})
+    date = request.args.get("date")
     return jsonify(
-        {"diffs": [{"sha": diff.revision, "message": diff.message} for diff in git_commit_diffs(DIR + path, 5)]}
+        {
+            "diffs": [
+                {"sha": diff.revision, "message": diff.message}
+                for diff in git_commit_diffs(
+                    DIR + path, 5, commit_date=datetime.fromtimestamp(int(date)) if date else None
+                )
+            ]
+        }
     )
 
 

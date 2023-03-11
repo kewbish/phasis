@@ -10,7 +10,9 @@
   let size = 5;
   let page = 0;
   let timelineData = [];
+  let commitsData = [];
   let newBatch = [];
+  let newCommits = [];
 
   const goCalendar = () => {
     navigate("/calendar");
@@ -20,11 +22,25 @@
     recomputeBatch();
   });
 
-  const recomputeBatch = () => {
+  const recomputeBatch = async () => {
     newBatch = monthData.splice(size * page, size * (page + 1) - 1);
+    let newCommitsTmp: Array<Array<{ sha: string; message: string }>> = [];
+    for (const entry of newBatch) {
+      const response = await fetch(
+        `http://localhost:5000/commits?path=${encodeURIComponent(
+          entry[1]
+        )}&date=${Math.floor(entry[0].getTime() / 1000)}`
+      );
+      const json = await response.json();
+      newCommitsTmp = newCommitsTmp.concat([
+        json.diffs as Array<{ sha: string; message: string }>,
+      ]);
+    }
+    newCommits = newCommitsTmp;
   };
 
   $: timelineData = [...timelineData, ...newBatch];
+  $: commitsData = [...commitsData, ...newCommits];
 
   const goEvent = (entry: [Date, ...Array<string>]) => {
     navigate(`/day?day=${+entry[0]}&file=${entry[1]}`);
@@ -47,7 +63,7 @@
     </span>
   </h1>
   <div id="timeline" bind:this={timelineElement}>
-    {#each timelineData as entry}
+    {#each timelineData as entry, i}
       <div class="entry">
         <div class="entry-header">
           <h3>{entry[1]} <EventIcon state={entry[2]} /></h3>
@@ -63,6 +79,15 @@
               day: "numeric",
             })} ›
           </h3>
+          <div class="flex-commits">
+            {#if commitsData[i] && commitsData[i].length != 0}
+              {#each commitsData[i] as diff}
+                <div class="circle">
+                  {diff.sha.substring(0, 6)}
+                </div>
+              {/each}
+            {/if}
+          </div>
           <button
             on:click={() => goEvent(entry)}
             on:keydown={() => goEvent(entry)}>view event</button
@@ -229,5 +254,28 @@
   button:hover {
     background: rgba(159, 227, 153, 0.35);
     padding: 12px 20px;
+  }
+  .circle {
+    background: rgba(159, 227, 153, 0.18);
+    box-shadow: 2px 4px 4px rgba(9, 186, 58, 0.25);
+    border: 1px solid #b8d6c0;
+    border-radius: 16px;
+    width: fit-content;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    transition: ease-in-out 0.2s;
+    padding: 0 0.5rem;
+  }
+  .circle:hover {
+    box-shadow: 2px 4px 4px rgba(9, 186, 58, 0.4);
+  }
+  .flex-commits {
+    display: flex;
+    gap: 1rem;
+    padding: 0.5rem;
+    width: fit-content;
   }
 </style>

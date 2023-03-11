@@ -1,5 +1,5 @@
 from collections import defaultdict
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from os import listdir, path, stat
 from spacy import load
 from spacy.tokens import DocBin
@@ -197,10 +197,16 @@ def click_git_commit_diffs(path: str, amt: int):
     print("\n".join([pdiff.__repr__() for pdiff in git_commit_diffs(path, amt)]))
 
 
-def git_commit_diffs(path: str, amt: int, commit: str | None = None) -> List[PhasisDiff]:
+def git_commit_diffs(
+    path: str, amt: int, commit_head: str | None = None, commit_date: date | None = None
+) -> List[PhasisDiff]:
     CONVERT_TO_RELATIVE_FS = "/".join(DIR.split("/")[:-3])
     repo = Repo.init(CONVERT_TO_RELATIVE_FS)
-    recent_commits = list(repo.iter_commits(commit if commit else "master", max_count=amt, paths=path))
+    config = {"max_count": amt, "paths": path}
+    if commit_date:
+        config["after"] = commit_date.strftime("%b %e %Y")
+        config["before"] = (commit_date + timedelta(days=1)).strftime("%b %e %Y")
+    recent_commits = list(repo.iter_commits(commit_head if commit_head else "master", **config))
     pdiffs = []
     for commit in recent_commits:
         diffs = commit.diff(commit.parents[0])
@@ -242,11 +248,15 @@ def click_git_fetch_diff(path: str, commit: str | None = None):
 
 def fetch_from_chatgpt(diff: PhasisDiff) -> str:
     bot = ChatGPT()
-    prompt = f"""Summarize in {"four" if diff.diff_contents_a and diff.diff_contents_b else "three"} sentences how the ideas of the two notes below differ. The notes are labelled "The first note" and "The second note" below.
+    prompt = f"""You are a personal knowledge management expert. My goal is to learn how my ideas change over time and why they change. Summarize the change in the points of view in two sentences. Then, ask an open-ended question about the difference in ideas. The notes are labelled "Before" and "After" below. Address your response to "you".
 
-The first note: "{diff.diff_contents_a[:700] if diff.diff_contents_a else ''}"
+For example, you would write "Before, you thought that the best approach to solving the problem was to divide and conquer. After, you used recursion and added a note to check your work with a friend."
 
-The second note: "{diff.diff_contents_b[:700] if diff.diff_contents_b else ''}"
+---
+
+Before: "{diff.diff_contents_a[:350] if diff.diff_contents_a else ''}"
+
+After: "{diff.diff_contents_b[:350] if diff.diff_contents_b else ''}"
     """
     response = bot.ask(prompt)
     if not response:
