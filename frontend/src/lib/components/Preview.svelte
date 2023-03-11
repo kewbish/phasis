@@ -22,9 +22,11 @@
 {#await fetchData}
   <p>Loading...</p>
 {:then contents}
-  <pre>
+  {#key contents}
+    <pre>
 {contents}
 </pre>
+  {/key}
   <CommitsList bind:filePath={path} />
 {/await}
 

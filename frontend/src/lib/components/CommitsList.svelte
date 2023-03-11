@@ -11,10 +11,13 @@
 
   const fetchChatGPT = async () => {
     const response = await fetch(
-      `http://localhost:5000/fetch_commit?path=${encodeURIComponent(filePath)}`
+      `http://localhost:5000/fetch_commit?path=${encodeURIComponent(
+        filePath
+      )}&commit=${currentSha}`
     );
     const json = await response.json();
     chatGPTResponse = json.message;
+    document.getElementById(currentSha).innerHTML = currentSha.substring(0, 6);
     return json.message;
   };
 
@@ -28,27 +31,38 @@
       fetchChatGPT();
     }
   }
+
+  const setSha = (sha: str) => {
+    currentSha = sha;
+    document.getElementById(sha).innerHTML =
+      '<div class="lds-dual-ring"></div>';
+  };
 </script>
 
-<div class="flex-commits">
-  {#await fetchData}
-    <p>Loading...</p>
-  {:then data}
-    {#each data as diff}
-      <div
-        class="circle"
-        onclick={() => {
-          currentSha = diff.sha;
-        }}
-      >
-        {diff.sha.substring(0, 6)}
-      </div>
-    {/each}
-  {:catch error}
-    <p>Error! {error}</p>
-  {/await}
+<div>
+  <div class="flex-commits">
+    {#await fetchData}
+      <p>Loading...</p>
+    {:then data}
+      {#each data as diff}
+        <div
+          class="circle"
+          on:click={() => setSha(diff.sha)}
+          on:keydown={() => setSha(diff.sha)}
+          id={diff.sha}
+        >
+          {diff.sha.substring(0, 6)}
+        </div>
+      {/each}
+    {:catch error}
+      <p>Error! {error}</p>
+    {/await}
+  </div>
   {#if chatGPTResponse}
-    <p class="dark-green"><em>{chatGPTResponse}</em></p>
+    <hr style="border-top: 1px solid #406e45; margin-top: 1rem" />
+    <p class="dark-green" style="padding-top: 0.5rem">
+      <em>{chatGPTResponse}</em>
+    </p>
   {/if}
 </div>
 
@@ -74,5 +88,6 @@
     display: flex;
     gap: 1rem;
     padding-top: 1rem;
+    width: fit-content;
   }
 </style>

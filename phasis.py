@@ -13,8 +13,9 @@ from git import Diff
 from git.repo import Repo
 from typing import List, Tuple
 from dataclasses import dataclass
-from revChatGPT.ChatGPT import Chatbot
+from chatgpt_wrapper import ChatGPT
 from json import loads
+from difflib import Differ, context_diff
 
 DIR = "/home/kewbish/EVB/dev/lc/"
 warnings.filterwarnings(
@@ -196,10 +197,10 @@ def click_git_commit_diffs(path: str, amt: int):
     print("\n".join([pdiff.__repr__() for pdiff in git_commit_diffs(path, amt)]))
 
 
-def git_commit_diffs(path: str, amt: int) -> List[PhasisDiff]:
+def git_commit_diffs(path: str, amt: int, commit: str | None = None) -> List[PhasisDiff]:
     CONVERT_TO_RELATIVE_FS = "/".join(DIR.split("/")[:-3])
     repo = Repo.init(CONVERT_TO_RELATIVE_FS)
-    recent_commits = list(repo.iter_commits("master", max_count=amt, paths=path))
+    recent_commits = list(repo.iter_commits(commit if commit else "master", max_count=amt, paths=path))
     pdiffs = []
     for commit in recent_commits:
         diffs = commit.diff(commit.parents[0])
@@ -207,43 +208,51 @@ def git_commit_diffs(path: str, amt: int) -> List[PhasisDiff]:
             filter(lambda diff_f: diff_f.a_path == path.replace(CONVERT_TO_RELATIVE_FS + "/", ""), diffs)
         )
         if len(diffs) <= 0:
-            return
+            return []
         pdiff = PhasisDiff(commit.hexsha, commit.message)
         a_blob_stream = diffs[0].a_blob
         if a_blob_stream:
             pdiff.diff_contents_a = a_blob_stream.data_stream.read().decode("utf-8")
         b_blob_stream = diffs[0].b_blob
         if b_blob_stream:
-            pdiff.diff_contents_a = b_blob_stream.data_stream.read().decode("utf-8")
+            pdiff.diff_contents_b = b_blob_stream.data_stream.read().decode("utf-8")
+        new_a, new_b = "", ""
+        if pdiff.diff_contents_a is not None and pdiff.diff_contents_b is not None:
+            for diff in list(Differ().compare(pdiff.diff_contents_a.splitlines(), pdiff.diff_contents_b.splitlines())):
+                if not diff:
+                    continue
+                for l in diff.splitlines():
+                    if l.startswith("-"):
+                        new_b += l[2:]
+                    else:
+                        new_a += l[2:]
+            pdiff.diff_contents_a = new_a
+            pdiff.diff_contents_b = new_b
         pdiffs += [pdiff]
     return pdiffs
 
 
 @cli.command(name="gitfd")
 @click.option("--path", help="Path of file to search commits for")
-def click_git_fetch_diff(path: str):
-    diffs = git_commit_diffs(path, 1)
+@click.option("--commit", help="Commit SHA to search from", default=None)
+def click_git_fetch_diff(path: str, commit: str | None = None):
+    diffs = git_commit_diffs(path, 1, commit)
     print(fetch_from_chatgpt(diffs[0]))
 
 
 def fetch_from_chatgpt(diff: PhasisDiff) -> str:
-    def read_secret() -> str:
-        with open("./config.json") as x:
-            raw_json = x.read()
-            json = loads(raw_json)
-            return json["session_token"]
-
-    chatbot = Chatbot({"session_token": read_secret()}, conversation_id=None, parent_id=None)
+    bot = ChatGPT()
     prompt = f"""Summarize in {"four" if diff.diff_contents_a and diff.diff_contents_b else "three"} sentences how the ideas of the two notes below differ. The notes are labelled "The first note" and "The second note" below.
 
 The first note: "{diff.diff_contents_a[:700] if diff.diff_contents_a else ''}"
 
 The second note: "{diff.diff_contents_b[:700] if diff.diff_contents_b else ''}"
     """
-    response = chatbot.ask(prompt, conversation_id=None, parent_id=None)
+    response = bot.ask(prompt)
     if not response:
         return ""
-    return response["message"]
+    bot._cleanup()
+    return response
 
 
 if __name__ == "__main__":

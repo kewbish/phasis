@@ -3,6 +3,7 @@ from flask_cors import CORS
 from sys import path
 from flask_caching import Cache
 
+
 path.append("../")
 
 from phasis import gen_timeline, DIR, git_commit_diffs, fetch_from_chatgpt
@@ -22,14 +23,14 @@ def json_timeline():
 
 
 @app.route("/contents", methods=["GET"])
-@cache.cached(timeout=300)
+@cache.cached(timeout=300, query_string=True)
 def json_contents():
     path = request.args.get("path")
     return jsonify({"contents": open(DIR + path).read() if path else ""})
 
 
 @app.route("/commits", methods=["Get"])
-@cache.cached(timeout=300)
+@cache.cached(timeout=300, query_string=True)
 def json_commits():
     path = request.args.get("path")
     if not path:
@@ -40,13 +41,13 @@ def json_commits():
 
 
 @app.route("/fetch_commit", methods=["Get"])
-@cache.cached(timeout=300)
+@cache.cached(timeout=300, query_string=True)
 def fetch_content():
     path = request.args.get("path")
-    # TODO: fetch with given SHA
+    commit = request.args.get("commit")
     if not path:
         return jsonify({"error": "No path"})
-    return jsonify({"message": fetch_from_chatgpt(git_commit_diffs(DIR + path, 1)[0])})
+    return jsonify({"message": fetch_from_chatgpt(git_commit_diffs(DIR + path, 1, commit)[0])})
 
 
 if __name__ == "__main__":

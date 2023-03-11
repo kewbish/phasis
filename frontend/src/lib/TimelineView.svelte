@@ -10,15 +10,21 @@
   let size = 5;
   let page = 0;
   let timelineData = [];
+  let newBatch = [];
 
   const goCalendar = () => {
     navigate("/calendar");
   };
 
-  $: timelineData = [
-    ...timelineData,
-    ...monthData.splice(size * page, size * (page + 1) - 1),
-  ];
+  onMount(() => {
+    recomputeBatch();
+  });
+
+  const recomputeBatch = () => {
+    newBatch = monthData.splice(size * page, size * (page + 1) - 1);
+  };
+
+  $: timelineData = [...timelineData, ...newBatch];
 
   let timelineElement: HTMLDivElement;
 </script>
@@ -49,7 +55,15 @@
         </div>
       </div>
     {/each}
-    <InfiniteScroll threshold={10} on:loadMore={() => page++} />
+    <InfiniteScroll
+      hasMore={newBatch.length}
+      threshold={10}
+      on:loadMore={() => {
+        page++;
+        recomputeBatch();
+      }}
+      horizontal={true}
+    />
   </div>
   <button on:click={goCalendar} on:keydown={goCalendar}>calendar view</button>
   <div id="to-prev">
@@ -76,19 +90,22 @@
   }
   #timeline {
     display: flex;
-    overflow-y: hidden;
-    overflow-x: scroll;
+    flex-direction: row;
     width: 100%;
     height: max-content;
     max-height: max-content;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    padding-top: 1rem;
     z-index: 3;
-    scrollbar-width: none;
   }
   #timeline::-webkit-scrollbar {
-    display: none;
+    height: 10px;
+    width: 10px;
   }
-  #timeline > :global(:nth-child(1)) {
-    margin-left: 15%;
+  #timeline::-webkit-scrollbar-thumb {
+    background-color: #9fe399;
+    border-radius: 8px;
   }
   #timeline > :global(:nth-child(1) > .hl) {
     border-image: linear-gradient(to left, #406e45, #ffffff00) 1;
