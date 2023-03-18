@@ -122,7 +122,7 @@ def print_timeline(timeline: List[Tuple]) -> None:
                 print(tp)
 
 
-def gen_timeline(death: int, sick: int, to_add: List = []):
+def gen_timeline(death: int, sick: int, to_add: List = [], no_translate: bool = False):
     creation_times = []
     for f in iglob(DIR + "**/*.md", recursive=True):
         c_time = datetime.fromtimestamp(stat(f).st_ctime).date()
@@ -139,6 +139,8 @@ def gen_timeline(death: int, sick: int, to_add: List = []):
             creation_times.append((m_time + timedelta(days=sick), f, "SICK"))
     final_timeline = to_add + creation_times
     final_timeline.sort()
+    if no_translate:
+        final_timeline = list(map(lambda x: (x[0].strftime("%s"), x[1], x[2]), final_timeline))
     return final_timeline
 
 

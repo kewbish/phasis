@@ -20,7 +20,7 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 @app.route("/timeline", methods=["GET"])
 @cache.cached(timeout=300)
 def json_timeline():
-    return jsonify(gen_timeline(14, 10))
+    return jsonify(gen_timeline(14, 10, no_translate=True))
 
 
 @app.route("/contents", methods=["GET"])

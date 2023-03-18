@@ -20,7 +20,10 @@
     const thisMonth = json
       .map(
         (entry: Array<string>) =>
-          [new Date(entry[0]), ...entry.slice(1)] as [Date, ...Array<string>]
+          [new Date(parseInt(entry[0]) * 1000), ...entry.slice(1)] as [
+            Date,
+            ...Array<string>
+          ]
       )
       .filter(
         (entry: [Date, ...Array<string>]) => monthDiff(entry[0], today) == 0

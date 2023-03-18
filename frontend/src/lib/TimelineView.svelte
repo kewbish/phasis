@@ -48,6 +48,23 @@
   };
 
   let timelineElement: HTMLDivElement;
+
+  const truncate = (fullStr: string, strLen: number) => {
+    if (fullStr.length <= strLen) return fullStr;
+
+    const separator = "…";
+
+    var sepLen = separator.length,
+      charsToShow = strLen - sepLen,
+      frontChars = Math.ceil(charsToShow / 2),
+      backChars = Math.floor(charsToShow / 2);
+
+    return (
+      fullStr.substr(0, frontChars) +
+      separator +
+      fullStr.substr(fullStr.length - backChars)
+    );
+  };
 </script>
 
 <main>
@@ -68,7 +85,7 @@
       <div class="entry">
         <div class="entry-header">
           <h3>
-            {entry[1].replace(gardenPath, "")}
+            {truncate(entry[1].replace(gardenPath, ""), 30)}
             <EventIcon state={entry[2]} />
           </h3>
         </div>
