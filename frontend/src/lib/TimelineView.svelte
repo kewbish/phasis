@@ -5,6 +5,7 @@
   import EventIcon from "./components/EventIcon.svelte";
 
   export let currentMonth: Date = new Date();
+  export let gardenPath: string = "";
   export let monthData: Array<[Date, ...Array<String>]> = [];
 
   let size = 5;
@@ -28,7 +29,7 @@
     for (const entry of newBatch) {
       const response = await fetch(
         `http://localhost:5000/commits?path=${encodeURIComponent(
-          entry[1]
+          entry[1].replace(gardenPath, "")
         )}&date=${Math.floor(entry[0].getTime() / 1000)}`
       );
       const json = await response.json();
@@ -43,7 +44,7 @@
   $: commitsData = [...commitsData, ...newCommits];
 
   const goEvent = (entry: [Date, ...Array<string>]) => {
-    navigate(`/day?day=${+entry[0]}&file=${entry[1]}`);
+    navigate(`/day?day=${+entry[0]}&file=${entry[1].replace(gardenPath, "")}`);
   };
 
   let timelineElement: HTMLDivElement;
@@ -66,7 +67,10 @@
     {#each timelineData as entry, i}
       <div class="entry">
         <div class="entry-header">
-          <h3>{entry[1]} <EventIcon state={entry[2]} /></h3>
+          <h3>
+            {entry[1].replace(gardenPath, "")}
+            <EventIcon state={entry[2]} />
+          </h3>
         </div>
         <div class="vl" />
         <div class="hl" />

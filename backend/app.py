@@ -27,7 +27,7 @@ def json_timeline():
 @cache.cached(timeout=300, query_string=True)
 def json_contents():
     path = request.args.get("path")
-    return jsonify({"contents": open(DIR + path).read() if path else ""})
+    return jsonify({"contents": open(path).read() if path else ""})
 
 
 @app.route("/commits", methods=["Get"])
@@ -36,6 +36,7 @@ def json_commits():
     path = request.args.get("path")
     if not path:
         return jsonify({"error": "No path"})
+    path = path.replace(DIR, "")
     date = request.args.get("date")
     return jsonify(
         {
@@ -56,6 +57,7 @@ def fetch_content():
     commit = request.args.get("commit")
     if not path:
         return jsonify({"error": "No path"})
+    path = path.replace(DIR, "")
     return jsonify({"message": fetch_from_chatgpt(git_commit_diffs(DIR + path, 1, commit)[0])})
 
 

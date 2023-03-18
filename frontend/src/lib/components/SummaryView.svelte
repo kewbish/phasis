@@ -26,19 +26,24 @@
     DEATH: "💀",
   };
 
-  const shortenedGardenPath =
+  const shortenedGardenPath: string = (
     gardenPath.length > 30
-      ? gardenPath.slice(
-          0,
-          30 - gardenPath.split("\\").pop().split("/").pop().length
-        ) +
-        (gardenPath
-          .slice(0, 30 - gardenPath.split("\\").pop().split("/").pop().length)
-          .endsWith("/")
-          ? " "
-          : "/") +
-        gardenPath.split("\\").pop().split("/").pop()
-      : gardenPath;
+      ? (() => {
+          var separator = separator || "…";
+
+          var sepLen = separator.length,
+            charsToShow = gardenPath.length - sepLen,
+            frontChars = Math.ceil(charsToShow / 2),
+            backChars = Math.floor(charsToShow / 2);
+
+          return (
+            gardenPath.substr(0, frontChars) +
+            separator +
+            gardenPath.substr(gardenPath.length - backChars)
+          );
+        })()
+      : gardenPath
+  ) as string;
 
   $: filteredData = data.filter(
     (entry) => !filter || FILTER_MAP[entry[2]] == filter
@@ -120,7 +125,8 @@
               on:click={() => setLastClickedPath(entry[1])}
               on:keydown={() => setLastClickedPath(entry[1])}
             >
-              <span class="dark-green">{shortenedGardenPath}/</span>{entry[1]}
+              <span class="dark-green">{shortenedGardenPath}</span
+              >{entry[1].replace(shortenedGardenPath, "")}
               -
               <EventIcon state={entry[2]} />
             </li>
@@ -149,8 +155,9 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    height: 100vh;
+    height: calc(100vh - 2rem);
     width: 100vw;
+    padding-bottom: 2rem;
   }
   #main-block {
     width: 80%;

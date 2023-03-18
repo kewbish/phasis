@@ -37,7 +37,7 @@
       ><MonthView bind:gardenPath bind:currentMonth bind:monthData /></Route
     >
     <Route path="/timeline"
-      ><TimelineView bind:currentMonth bind:monthData /></Route
+      ><TimelineView bind:currentMonth bind:monthData bind:gardenPath /></Route
     >
   </div>
 </Router>

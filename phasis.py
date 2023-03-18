@@ -1,6 +1,9 @@
 from collections import defaultdict
 from datetime import date, datetime, timedelta
-from os import listdir, path, stat
+from os import path, stat
+from glob import iglob
+from pickle import dump
+from pickle import load as pickle_load
 from spacy import load
 from spacy.tokens import DocBin
 from spacy.tokens.doc import Doc
@@ -17,7 +20,7 @@ from chatgpt_wrapper import ChatGPT
 from json import loads
 from difflib import Differ, context_diff
 
-DIR = "/home/kewbish/EVB/dev/lc/"
+DIR = "/home/kewbish/EVB/"
 warnings.filterwarnings(
     "ignore",
     message="The localize method is no longer necessary, as this time zone supports the fold attribute",
@@ -32,23 +35,30 @@ class Phasis:
         Doc.set_extension("file_source", default=None)
 
         if not path.isfile("./em.phasis"):
-            files = [(open(DIR + f).read(), f) for f in listdir(DIR)]
+            files = [(open(f).read(), f) for f in iglob(DIR + "**/*.md", recursive=True)]
 
             doc_bin = DocBin(store_user_data=True)
+            timeline = []
 
             file_dates = defaultdict(list)
             for doc, context in self.nlp.pipe(files, as_tuples=True):
                 for ent in doc.ents:
                     if ent.label_ == "DATE":
                         file_dates[context].append(ent)
+                        parsed_date = date_parse(ent.text, settings={"RELATIVE_BASE": datetime.now()})
+                        parsed_date = parsed_date.date() if parsed_date else parsed_date
+                        if parsed_date:
+                            timeline.append((parsed_date, doc._.file_source))
                 doc._.file_source = context
                 doc_bin.add(doc)
 
+            timeline.sort()
+            self.timeline = timeline
             self.spinner.stop()
             self.file_dates = file_dates
 
             doc_bin.to_disk("./em.phasis")
-        else:
+        elif not path.isfile("./tl.phasis"):
             doc_bin = DocBin().from_disk("./em.phasis")
             timeline = []
 
@@ -65,7 +75,13 @@ class Phasis:
                 doc_bin.add(doc)
             timeline.sort()
             self.timeline = timeline
+            with open("./tl.phasis", "wb") as x:
+                dump(timeline, x)
 
+            self.spinner.stop()
+        else:
+            with open("./tl.phasis", "rb") as x:
+                self.timeline = pickle_load(x)
             self.spinner.stop()
 
 
@@ -108,9 +124,9 @@ def print_timeline(timeline: List[Tuple]) -> None:
 
 def gen_timeline(death: int, sick: int, to_add: List = []):
     creation_times = []
-    for f in listdir(DIR):
-        c_time = datetime.fromtimestamp(stat(DIR + f).st_ctime).date()
-        m_time = datetime.fromtimestamp(stat(DIR + f).st_mtime).date()
+    for f in iglob(DIR + "**/*.md", recursive=True):
+        c_time = datetime.fromtimestamp(stat(f).st_ctime).date()
+        m_time = datetime.fromtimestamp(stat(f).st_mtime).date()
         has_died = (datetime.now().date() - m_time).days > death
         is_sick = (datetime.now().date() - m_time).days > sick
         creation_times.append((c_time, f, "CREATE"))
@@ -126,10 +142,17 @@ def gen_timeline(death: int, sick: int, to_add: List = []):
     return final_timeline
 
 
-@click.command()
+@click.group(invoke_without_command=True)
+@click.pass_context
+def cli(context):
+    if not context.invoked_subcommand:
+        show_timeline(14, 10)
+
+
+@cli.command(name="timeline")
 @click.option("--death", default=14, help="Number of days after which a file is declared dead.")
 @click.option("--sick", default=10, help="Number of days after which a file needs more attention.")
-def show_timeline(death: int, sick: int, to_print: bool = True):
+def show_timeline(death: int, sick: int):
     phasis = Phasis()
     if not phasis.timeline:
         print("No timeline yet...")
@@ -141,13 +164,6 @@ def show_timeline(death: int, sick: int, to_print: bool = True):
     print_timeline(final_timeline)
 
 
-@click.group(invoke_without_command=True)
-@click.pass_context
-def cli(context):
-    if not context.invoked_subcommand:
-        gen_timeline()
-
-
 @cli.command(name="get_sick")
 @click.option("--death", default=14, help="Number of days after which a file is declared dead.")
 @click.option("--sick", default=10, help="Number of days after which a file needs more attention.")
@@ -155,8 +171,8 @@ def get_sick(death: int, sick: int):
     spinner = yaspin(text="Checking for symptoms ...")
     spinner.start()
     creation_times = []
-    for f in listdir(DIR):
-        m_time = datetime.fromtimestamp(stat(DIR + f).st_mtime).date()
+    for f in iglob(DIR + "**/*.md", recursive=True):
+        m_time = datetime.fromtimestamp(stat(f).st_mtime).date()
         is_sick = sick < (datetime.now().date() - m_time).days < death
         if is_sick:
             creation_times.append((m_time + timedelta(days=sick), f, "SICK"))
@@ -168,7 +184,7 @@ def get_sick(death: int, sick: int):
 @cli.command(name="gittt")
 def git_time_travel():
     nlp = load("en_core_web_sm")
-    repo = Repo.init("/".join(DIR.split("/")[:-3]))
+    repo = Repo.init(DIR)
     recent_commits = list(repo.iter_commits("master", max_count=10))
     print("Time Travelling...")
     dates = defaultdict(list)
@@ -200,8 +216,7 @@ def click_git_commit_diffs(path: str, amt: int):
 def git_commit_diffs(
     path: str, amt: int, commit_head: str | None = None, commit_date: date | None = None
 ) -> List[PhasisDiff]:
-    CONVERT_TO_RELATIVE_FS = "/".join(DIR.split("/")[:-3])
-    repo = Repo.init(CONVERT_TO_RELATIVE_FS)
+    repo = Repo.init(DIR)
     config = {"max_count": amt, "paths": path}
     if commit_date:
         config["after"] = commit_date.strftime("%b %e %Y")
@@ -210,9 +225,7 @@ def git_commit_diffs(
     pdiffs = []
     for commit in recent_commits:
         diffs = commit.diff(commit.parents[0])
-        diffs: List[Diff] = list(
-            filter(lambda diff_f: diff_f.a_path == path.replace(CONVERT_TO_RELATIVE_FS + "/", ""), diffs)
-        )
+        diffs: List[Diff] = list(filter(lambda diff_f: diff_f.a_path == path.replace(DIR, ""), diffs))
         if len(diffs) <= 0:
             return []
         pdiff = PhasisDiff(commit.hexsha, commit.message)
@@ -247,6 +260,8 @@ def click_git_fetch_diff(path: str, commit: str | None = None):
 
 
 def fetch_from_chatgpt(diff: PhasisDiff) -> str:
+    if not diff.diff_contents_a or not diff.diff_contents_b:
+        return "Note created or deleted - no insights found!"
     bot = ChatGPT()
     prompt = f"""You are a personal knowledge management expert. My goal is to learn how my ideas change over time and why they change. Summarize the change in the points of view in two sentences. Then, ask an open-ended question about the difference in ideas. The notes are labelled "Before" and "After" below. Address your response to "you".
 
